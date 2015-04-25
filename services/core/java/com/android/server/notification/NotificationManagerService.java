@@ -814,13 +814,13 @@ public class NotificationManagerService extends SystemService {
         }
     };
 
-    class LEDSettingsObserver extends ContentObserver {
+    class SettingsObserver extends ContentObserver {
         private final Uri NOTIFICATION_LIGHT_PULSE_URI
                 = Settings.System.getUriFor(Settings.System.NOTIFICATION_LIGHT_PULSE);
         private final Uri ENABLED_NOTIFICATION_LISTENERS_URI
                 = Settings.Secure.getUriFor(Settings.Secure.ENABLED_NOTIFICATION_LISTENERS);
 
-        LEDSettingsObserver(Handler handler) {
+        SettingsObserver(Handler handler) {
             super(handler);
         }
 
@@ -887,7 +887,7 @@ public class NotificationManagerService extends SystemService {
         }
     }
 
-    private LEDSettingsObserver mSettingsObserver;
+    private SettingsObserver mSettingsObserver;
     private ZenModeHelper mZenModeHelper;
 
     private final Runnable mBuzzBeepBlinked = new Runnable() {
@@ -1033,7 +1033,7 @@ public class NotificationManagerService extends SystemService {
         getContext().registerReceiverAsUser(mPackageIntentReceiver, UserHandle.ALL, sdFilter, null,
                 null);
 
-        mSettingsObserver = new LEDSettingsObserver(mHandler);
+        mSettingsObserver = new SettingsObserver(mHandler);
         mSettingsObserver.observe();
 
         mArchive = new Archive(resources.getInteger(
@@ -2229,9 +2229,6 @@ public class NotificationManagerService extends SystemService {
         // light
         // release the light
         boolean wasShowLights = mLights.remove(record.getKey());
-        if (mLedNotification != null && record.getKey().equals(mLedNotification.getKey())) {
-            mLedNotification = null;
-        }
         final boolean canInterruptWithLight = canInterrupt || isLedNotificationForcedOn(record);
         if ((notification.flags & Notification.FLAG_SHOW_LIGHTS) != 0 && canInterruptWithLight) {
             mLights.add(record.getKey());
@@ -2834,23 +2831,22 @@ public class NotificationManagerService extends SystemService {
     void updateLightsLocked()
     {
         // handle notification lights
-        if (mLedNotification == null) {
-            // use most recent light with highest score
-            for (int i = mLights.size(); i > 0; i--) {
-                NotificationRecord r = mNotificationsByKey.get(mLights.get(i - 1));
-                if (mLedNotification == null
-                        || r.sbn.getScore() > mLedNotification.sbn.getScore()) {
-                    mLedNotification = r;
-                }
+        NotificationRecord ledNotification = null;
+        while (ledNotification == null && !mLights.isEmpty()) {
+            final String owner = mLights.get(mLights.size() - 1);
+            ledNotification = mNotificationsByKey.get(owner);
+            if (ledNotification == null) {
+                Slog.wtfStack(TAG, "LED Notification does not exist: " + owner);
+                mLights.remove(owner);
             }
         }
 
         // Don't flash while we are in a call or screen is on
         // (unless Notification has EXTRA_FORCE_SHOW_LGHTS)
         final boolean enableLed;
-        if (mLedNotification == null) {
+        if (ledNotification == null) {
             enableLed = false;
-        } else if (isLedNotificationForcedOn(mLedNotification)) {
+        } else if (isLedNotificationForcedOn(ledNotification)) {
             enableLed = true;
         } else if (mInCall || mScreenOn) {
             enableLed = false;
@@ -2862,8 +2858,8 @@ public class NotificationManagerService extends SystemService {
             mNotificationLight.turnOff();
             mStatusBar.notificationLightOff();
         } else {
-            final Notification ledno = mLedNotification.sbn.getNotification();
-            final NotificationLedValues ledValues = getLedValuesForNotification(mLedNotification);
+            final Notification ledno = ledNotification.sbn.getNotification();
+            final NotificationLedValues ledValues = getLedValuesForNotification(ledNotification);
             int ledARGB;
             int ledOnMS;
             int ledOffMS;
