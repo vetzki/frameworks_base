@@ -2343,6 +2343,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             loadIntegerSetting(stmt, Settings.System.STATUS_BAR_NOTIF_COUNT,
                     R.integer.def_notif_count);
+
+            loadIntegerSetting(stmt, Settings.System.STATUS_BAR_QUICK_QS_PULLDOWN,
+                    R.integer.def_quick_qs_pulldown);
+
         } finally {
             if (stmt != null) stmt.close();
         }

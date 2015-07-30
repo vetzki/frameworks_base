@@ -207,6 +207,9 @@
     <!-- Default for Settings.System.DOUBLE_TAP_SLEEP_GESTURE -->
     <integer name="def_double_tap_sleep_gesture">0</integer>
 
+    <!-- Default for System.STATUS_BAR_QUICK_QS_PULLDOWN -->
+    <integer name="def_quick_qs_pulldown">0</integer>
+
     <!-- Default for Settings.Global.GUEST_USER_ENABLED -->
     <bool name="def_guest_user_enabled">true</bool>
     
