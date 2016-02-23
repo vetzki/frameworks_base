@@ -56,7 +56,7 @@ import com.android.systemui.statusbar.stack.NotificationStackScrollLayout;
 
 public class StatusBarWindowView extends FrameLayout {
     public static final String TAG = "StatusBarWindowView";
-    public static final boolean DEBUG = BaseStatusBar.DEBUG;
+    public static final boolean DEBUG = false;
 
     private DragDownHelper mDragDownHelper;
     private NotificationStackScrollLayout mStackScrollLayout;

@@ -44,7 +44,7 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
 public abstract class PanelView extends FrameLayout {
-    public static final boolean DEBUG = PanelBar.DEBUG;
+    public static final boolean DEBUG = false;
     public static final String TAG = PanelView.class.getSimpleName();
 
     private final void logf(String fmt, Object... args) {
