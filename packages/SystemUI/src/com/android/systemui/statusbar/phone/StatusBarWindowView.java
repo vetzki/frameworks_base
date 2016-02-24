@@ -261,7 +261,7 @@ public class StatusBarWindowView extends FrameLayout {
                 if (DEBUG) Log.w(TAG, "logging double tap gesture");
                 mDoubleTapGesture.onTouchEvent(ev);
             } else if (mService.getBarState() == StatusBarState.KEYGUARD
-                    && (ev.getY() > (h - mStatusBarHeaderHeight)) {
+                    && (ev.getY() > (h - mStatusBarHeaderHeight))) {
                 if (DEBUG) Log.w(TAG, "logging lock screen double tap gesture");
                 mDoubleTapGesture.onTouchEvent(ev);
             }
